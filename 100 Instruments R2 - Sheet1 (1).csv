@@ -1,0 +1,101 @@
+Zhonghu,Instrument Difficulty,Family,Group,Country Of Origin,How Far Away Is It From Me
+Axatse,1,percussion,Shaker,Africa,5798 Miles
+Gankogui,1,percussion,Bell,Africa,5798 Miles
+Djembe,1,percussion,Drum,Africa,5798 Miles
+Vibraphone,3,percussion,Mallet,Africa,5798 Miles
+Achere,1,percussion,Shaker,Central America,2368 Miles
+Bongos,1,percussion,Drum,Central America,2368 Miles
+Claves,2,percussion,Drum,Central America,2368 Miles
+Guiro,2,percussion,Drum,Central America,2368 Miles
+Steel Drum,3,percussion,Mallet,Central America,2368 Miles
+Maracas,2,percussion,Shaker,Central America,2368 Miles
+Marimba,3,percussion,Mallet,Central America,2368 Miles
+Dholak,1,percussion,Drum,China,6749 Miles
+Ghungroo,1,percussion,Bell,China,6749 Miles
+Bell,3,percussion,Bell,China,6749 Miles
+Gong,3,percussion,Bell,China,6749 Miles
+Banhu,1,string,Bowed,China,6749 Miles
+Zhonghu,1,string,Bowed,China,6749 Miles
+Dobro Guitar,1,string,Strummed,China,6749 Miles
+Erhu,1,string,Bowed,China,6749 Miles
+Xiao,1,wind,flutes,China,6749 Miles
+Dizi,1,wind,flutes,China,6749 Miles
+Timpani,1,percussion,Drum,England,3280 Miles
+Chimes,1,percussion,Bell,England,3280 Miles
+Bodhran,2,percussion,Drum,England,3280 Miles
+Classic guitar,1,string,Strummed,England,3280 Miles
+Bouzouki,1,string,Strummed,England,3280 Miles
+Cittern,1,string,Strummed,England,3280 Miles
+lute,2,string,Strummed,England,3280 Miles
+Cornet,2,wind,trumpets,England,3280 Miles
+Bugle,2,wind,trumpets,England,3280 Miles
+Long Trumpet,2,wind,trumpets,England,3280 Miles
+Hurdy Gurdy,1,key,Chordophone,France,3446 Miles
+Celesta,2,key,Idiophone,France,3446 Miles
+Glasschord,2,key,Idiophone,France,3446 Miles
+Dulcitone,2,key,Idiophone,France,3446 Miles
+Pedal Harp,1,string,Plucked,France,3446 Miles
+Baritone saxophone,3,wind,saxophones,France,3446 Miles
+tenor saxophone,3,wind,saxophones,France,3446 Miles
+soprano saxophone,3,wind,saxophones,France,3446 Miles
+contrabass saxophone,3,wind,saxophones,France,3446 Miles
+alto saxophone,3,wind,saxophones,France,3446 Miles
+alto trombone,3,wind,trombones,France,3446 Miles
+Tenor Trombone,3,wind,trombones,France,3446 Miles
+French Horn,3,wind,trumpets,France,3446 Miles
+Carillon,1,key,Idiophone,Germany,3852 Miles
+Tangent Piano,,key,Chordophone,germany,3852 Miles
+Fortepiano,1,key,Chordophone,Germany,3852 Miles
+Clavichord,2,key,Chrodophone,Germany,3852 Miles
+Clavinet,2,key,Chordophone,Germany,3852 Miles
+Clavier,2,key,Chordophone,germany,3852 Miles
+Electric Piano,3,key,Chordophone,Germany,3852 Miles
+Pianet,3,key,Chordophone,Germany,3852 Miles
+Wurlitzer Electric Piano,3,key,Chordophone,Germany,3852 Miles
+Toy Piano,3,key,Idiphone,Germany,3852 Miles
+Glockenspiel,2,percussion,Bell,Germany,3852 Miles
+Kalimba,2,percussion,Drum,germany,3852 Miles
+Tom Tom,2,percussion,Drum,germany,3852 Miles
+Violin,1,string,Bowed,Germany,3852 Miles
+Flugelhorn,1,wind,trumpets,Germany,3852 Miles
+Piccolo Trumpet,1,wind,trumpets,Germany,3852 Miles
+Bandoneon,2,wind,Accordion,Germany,3852 Miles
+German Concertina,2,wind,Accordion,Germany,3852 Miles
+Euphonium,2,wind,tubas,Germany,3852 Miles
+Concert Tuba,2,wind,tubas,Germany,3852 Miles
+Upright Tuba,2,wind,tubas,Germany,3852 Miles
+bass trombone,3,wind,trombones,Germany,3852 Miles
+Monochord,1,key,Chordophone,Italy,4102 Miles
+Harpsichord,1,key,Chordophone,Italy,4102 Miles
+Virginal,1,key,Chordophone,Italy,4102 Miles
+Piano,3,key,Chordophone,Italy,4102 Miles
+Violetta,1,string,Bowed,Italy,4102 Miles
+Flamenco Guitar,1,string,Strummed,Italy,4102 Miles
+Viola,1,string,Bowed,Italy,4102 Miles
+Cello,2,string,Bowed,Italy,4102 Miles
+Ocarina,1,wind,flutes,Italy,4102 Miles
+Optigan,2,key,Electrophone,North America,394 Miles
+Mellotron,2,key,Electrophone,North America,394 Miles
+Rhodes Piano,3,key,Chordophone,North America,394 Miles
+Keytar,3,key,Electrophone,North America,394 Miles
+Drum Machine,3,key,Electrophone,North America,394 Miles
+Moog Synthesizer,3,key,Electrophone,North America,394 Miles
+Electric Guitar,1,string,Strummed,North America,394 Miles
+Dulcimer,1,string,Plucked,North America,394 Miles
+Double Bass,1,string,Strummed,North America,394 Miles
+Twelve String Guitar,1,string,Strummed,North America,394 Miles
+Banjo,2,string,Strummed,North America,394 Miles
+Ukulele,3,string,Strummed,North America,394 Miles
+Baritone Ukulele,3,string,Strummed,North America,394 Miles
+Native American Flute,1,wind,flutes,North America,394 Miles
+Sousaphone,2,wind,tubas,North America,394 Miles
+Theremin,2,key,Electrophone,Russia,4499 Miles
+Russian Guitar,1,string,Strummed,Russia,4499 Miles
+Mandolin,1,string,Strummed,Russia,4499 Miles
+Balalaika,1,string,Strummed,Russia,4499 Miles
+Cabasa,1,percussion,Shaker,South America,4834 Miles
+Agogo,2,percussion,Bell,South America,4834 Miles
+Xylophone,2,percussion,Mallet,South America,4834 Miles
+Conga,2,percussion,Drum,South America,4834 Miles
+Rainstick,3,percussion,Shaker,South America,4834 Miles
+Peruvian Panflutes,2,wind,flutes,South America,4834 Miles
