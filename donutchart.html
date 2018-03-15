@@ -38,14 +38,14 @@
         height = 500,
         cwidth = 40;
 
-    var outlineArc = d3.svg.arc()
-            .innerRadius(function(d, i, j) { return arc.innerRadius(10+cwidth*j)(d); })
-            .outerRadius(function(d, j) { return arc.outerRadius(cwidth*(j+3))});
+    // var outlineArc = d3.svg.arc()
+    //         .innerRadius(function(d, i, j) { return arc.innerRadius(10+cwidth*j)(d); })
+    //         .outerRadius(function(d, j) { return arc.outerRadius(cwidth*(j+3))});
+    //
+    var color = d3.scaleOrdinal()
+        .range(["#F16A6B", "#5AC4BE", "#AAD04C", "#F7941D", "#58595B"]);
 
-    // var color = d3.scaleOrdinal()
-    //     .range(["#F16A6B", "#5AC4BE", "#AAD04C", "#F7941D", "#58595B"]);
-
-    var color = d3.scale.category20();
+    // var color = d3.scale.category20();
 
     var pie = d3.layout.pie()
         .sort(null);
@@ -65,17 +65,17 @@
         .attr("fill", function(d, i) { return color(i); })
         .attr("d", function(d, i, j) { return arc.innerRadius(10+cwidth*j).outerRadius(cwidth*(j+1))(d); });
 
-
-    var outerPath = svg.selectAll(".outlineArc")
-          .data(dataset)
-        .enter().append("path")
-          .attr("fill", "none")
-          .attr("stroke", "gray")
-          .attr("class", "outlineArc")
-          .attr("d", outlineArc);
-
-
-
+    //
+    // var outerPath = svg.selectAll(".outlineArc")
+    //       .data(dataset)
+    //     .enter().append("path")
+    //       .attr("fill", "none")
+    //       .attr("stroke", "gray")
+    //       .attr("class", "outlineArc")
+    //       .attr("d", outlineArc);
+    //
+    //
+    //
     
 
 </script>
