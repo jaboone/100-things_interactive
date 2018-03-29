@@ -38,14 +38,35 @@
         height = 500,
         cwidth = 40;
 
+    //TODO: Challenges for the Donut route
+        //Would need precise coloring method for "blank" spaces. Could also try creating a physical gap, but might be tricky trying to get the length right
+        //
+
+   //TODO: Can't seem to get an outline arc to show
+        //Will also need to find a solution for creating accurate group widths
+        //Second outline arc code block below
+
     // var outlineArc = d3.svg.arc()
     //         .innerRadius(function(d, i, j) { return arc.innerRadius(10+cwidth*j)(d); })
     //         .outerRadius(function(d, j) { return arc.outerRadius(cwidth*(j+3))});
     //
-    var color = d3.scaleOrdinal()
-        .range(["#F16A6B", "#5AC4BE", "#AAD04C", "#F7941D", "#58595B"]);
 
-    // var color = d3.scale.category20();
+
+    // var color = d3.scaleOrdinal()
+    //     .range(["#F16A6B", "#5AC4BE", "#AAD04C", "#F7941D", "#58595B"]);
+
+    //TODO: work out if statement to color each fruit type differently
+    //here I am trying to create an if-else statement that will return different color values for each data type. This would translate into the different instrument family colorings
+
+    // var color = function(d){
+    //     if(d.data.apples === true){
+    //         return "blue"
+    //     } else {
+    //         return "black"
+    //     }
+    // });;
+
+    var color = d3.scale.category20();
 
     var pie = d3.layout.pie()
         .sort(null);
@@ -63,6 +84,7 @@
         .data(function(d) { return pie(d); })
         .enter().append("path")
         .attr("fill", function(d, i) { return color(i); })
+        .attr("class", function(d) { return "class" + d; })
         .attr("d", function(d, i, j) { return arc.innerRadius(10+cwidth*j).outerRadius(cwidth*(j+1))(d); });
 
     //

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style>
+svg {
+	background-color: #525354;
+	max-width: 90vw;		/* 90% of view width */
+	max-height: 90vh;		/* 90% of view height */
+}
+circle {
+	stroke: none;
+	fill: #606162;
+}
+path {
+	/*stroke: #525354;*/
+	/*stroke-width: 1;*/
+}
+.family1 {
+	fill: #accf5d;
+}
+.family2 {
+	fill: #e17173;
+}
+.family3 {
+	fill: #65c4be;
+}
+.family4 {
+	fill: #f59640;
+}
+g.text {
+	transform: rotate(-90deg);	/* Align text with angle 0 */
+}
+text {
+	font-family: sans-serif;
+	font-size: 12px;
+	fill: #ffffff;
+	text-anchor: end;		/* Horizontal align */
+	alignment-baseline: middle;	/* Vertical align */
+}
+</style>
+<svg viewBox="0 0 500 500">
+
+    <!-- Perform all drawing and calculations from center of SVG -->
+    <g transform="translate(250,250)">
+
+        <!-- Add background circle -->
+        <circle data-attr-r="{{.|backgroundRadius}}"></circle>
+
+        <!-- Repeat for every instrument -->
+        <g data-repeat="{{.}}">
+
+            <!-- Rotate instrument into position (all calculations are relative to angle 0 from here on) -->
+            <g data-attr-transform="{{.|rotateInstrument}}">
+
+                <!-- Repeat for every difficulty level -->
+                <g data-attr-class="{{.|familyClass}}" data-repeat="{{difficulty|asWedgeArray}}">
+
+                    <!-- Draw single wedge at current difficulty level -->
+                    <path data-attr-d="{{.|wedgePath}}"></path>
+                </g>
+
+                <!-- Draw instrument name -->
+                <g class="text">
+                    <text data-attr-x="{{.|textPosition}}" data-attr-transform="{{.|textRotate}}">{{name}}</text>
+                </g>
+            </g>
+        </g>
+    </g>
+</svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script src="https://unpkg.com/d3-template-plugin/build/d3-template.js"></script>
+<script>
+
+var width = 500;	// viewbox sets fixed width/height
+var height = 500;
+var margin = {top: 20, right: 20, bottom: 20, left: 20};
+var maxRadius = Math.min(
+	(width - margin.left - margin.right) / 2,
+	(height - margin.top - margin.bottom) / 2
+);
+var minRadius = maxRadius * .2;
+
+// Read in data and render onto template
+d3.csv("instruments.csv", function(error, instruments) {
+
+	// Convert/extract instruments data
+	var familyColorIndex = 1;
+	var families = {};
+	instruments.forEach(function(instrument) {
+
+		// Convert string to integer
+		instrument.difficulty = +instrument.difficulty;
+
+		// Give every family unique color index
+		if(!families[instrument.family]) {
+			families[instrument.family] = familyColorIndex;
+			familyColorIndex++;
+		}
+	});
+
+	// Sort instruments (family first, then name)
+	instruments.sort(function(a, b) {
+		var result = a.family.localeCompare(b.family);
+		if(result === 0) {
+			result = a.name.localeCompare(b.name);
+		}
+		return result;
+	});
+
+	// Create scale for radius wedges (donut parts)
+	var difficultyExtent = d3.extent(instruments, function(instrument) { return instrument.difficulty; });
+	var difficultyRange = d3.range(difficultyExtent[0], difficultyExtent[1] + 1);	// + 1 since 'stop' is not in range
+	var radiusScale = d3.scaleBand()
+	    .domain(difficultyRange)
+	    .range([minRadius, maxRadius])
+	    .paddingInner(.2)
+	;
+
+	// Create arc generator for wedges (donut parts)
+	var partWidthInDegress = 360 / instruments.length;
+	var partWidthInRadians = 2 * Math.PI / instruments.length;
+	var arcGenerator = d3.arc()
+		.startAngle(0)
+		.endAngle(partWidthInRadians)
+	;
+
+	// Create filters for template
+	d3.renderFilter("backgroundRadius", function() {
+		// Extent a little beyond max radius
+		return maxRadius * 1.05;
+	});
+	d3.renderFilter("rotateInstrument", function(d, i) {
+		// Every instrument is rotated into position
+		// Now the wedges and text can be positioned more easily (all start at angle 0)
+		return "rotate(" + (partWidthInDegress * i) + ")";
+	});
+	d3.renderFilter("asWedgeArray", function(d) {
+		// Create an array of difficulty levels up to 'actual' difficulty level
+		// Difficulty 3 will result in [1, 2, 3]. For every level a wedge will be created.
+		return d3.range(1, d + 1);
+	});
+	d3.renderFilter("wedgePath", function(d) {
+		// Create path data for wedge
+		// Based on difficulty level the radius of the wedge is specified
+		return arcGenerator({
+			innerRadius: radiusScale(d),
+			outerRadius: radiusScale(d) + radiusScale.bandwidth()
+		});
+	});
+	d3.renderFilter("textPosition", function(d) {
+		// Text is aligned at outer radius (and extends a little)
+		var outerRadius = radiusScale(difficultyExtent[1]) + radiusScale.bandwidth();
+		return outerRadius * 1.1;
+	});
+	d3.renderFilter("textRotate", function() {
+		// Rotate text so it will be drawn in the middle of the wedge
+		return "rotate(" + (partWidthInDegress / 2) + ")";
+	});
+	d3.renderFilter("familyClass", function(d) {
+		// Return class name based on family name
+		return "family" + families[d.family];
+	});
+
+	// Create template and render data onto template
+	d3.select("svg")
+		.template()
+		.render(instruments)
+	;
+});
+
+</script>
