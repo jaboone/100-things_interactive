@@ -88,6 +88,9 @@ g.name {
         </g>
     </g>
 </svg>
+
+<a id="trigger" href="#">Click Me!</a>
+
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://unpkg.com/d3-template-plugin/build/d3-template.js"></script>
 <script>
@@ -250,6 +253,16 @@ d3.csv("instruments.csv", function(error, instruments) {
 		.template()
 		.render(instruments)
 	;
+
+	var chart = d3.select("svg") ;
+
+    d3.select("#trigger").on("click", function() {
+        // console.log('got here');
+        chart
+            .transition() // ALL OF OUR TRANSITIONS WILL GO HERE!
+            .attr("x", 250); // Set New Position
+    });
+
 });
 
 </script>
