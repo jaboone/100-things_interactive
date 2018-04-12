@@ -111,7 +111,7 @@ var textPosition = maxLevelRadius * 1.1;	// Extend a bit outside level radius
 var groupPaddingAngle = 0.04;
 
 // Read in data and render onto template
-d3.csv("instruments.csv", function(error, instruments) {
+d3.csv("instruments-england.csv", function(error, instruments) {
 
 	// Convert/extract instruments data
 	var familyColorIndex = 1;
@@ -254,13 +254,62 @@ d3.csv("instruments.csv", function(error, instruments) {
 		.render(instruments)
 	;
 
-	var chart = d3.select("svg") ;
+	// var chart = d3.select("svg") ;
 
+    // d3.select("#trigger").on("click", function() {
+    //     // console.log('got here');
+    //     chart
+    //         .transition() // ALL OF OUR TRANSITIONS WILL GO HERE!
+    //         .attr("x", 250); // Set New Position
+    // });
+
+    // load africa
     d3.select("#trigger").on("click", function() {
-        // console.log('got here');
-        chart
-            .transition() // ALL OF OUR TRANSITIONS WILL GO HERE!
-            .attr("x", 250); // Set New Position
+        d3.csv("instruments-africa.csv", function(instruments) {
+
+            var familyColorIndex = 1;
+            var families = {};
+            instruments.forEach(function(instrument) {
+
+                // Convert string to integer
+                instrument.difficulty = +instrument.difficulty;
+
+                // Give every family unique color index
+                if(!families[instrument.family]) {
+                    families[instrument.family] = familyColorIndex;
+                    familyColorIndex++;
+                }
+            });
+            // Sort instruments (group first, then family, then name)
+            // This assumes a family is always part of the same group
+            // (since family specifies color and colors should be next to each other for easthetics)
+            instruments.sort(function(a, b) {
+                var result = a.group.localeCompare(b.group);
+                if(result === 0) {
+                    result = a.family.localeCompare(b.family);
+                    if(result === 0) {
+                        result = a.name.localeCompare(b.name);
+                    }
+                }
+                return result;
+            });
+
+
+            return {
+                name : instruments.name,
+                difficulty : +instruments.difficulty,
+                family: instruments.family,
+                group: instruments.group,
+                origin: instruments.origin,
+                distance: instruments.distance
+
+
+            };
+        }, function(error, rows) {
+            ratData = rows;
+            console.log(ratData);
+            updateData();
+        });
     });
 
 });
