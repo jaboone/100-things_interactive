@@ -107,11 +107,11 @@ var minLevelRadius = maxRadius * .2;		// At 20% of max radius
 var maxLevelRadius = maxRadius * .75;		// At 75% of max radius
 var groupRadius = maxRadius * .9;		// At 90% of max radius
 var backgroundRadius = maxLevelRadius * 1.05;	// Extend a bit outside level radius
-var textPosition = maxLevelRadius * 1.1;	// Extend a bit outside level radius
+var textPosition = maxLevelRadius * .8;	// Extend a bit outside level radius
 var groupPaddingAngle = 0.04;
 
 // Read in data and render onto template
-d3.csv("instruments-england.csv", function(error, instruments) {
+d3.csv("instruments-africa.csv", function(error, instruments) {
 
 	// Convert/extract instruments data
 	var familyColorIndex = 1;
@@ -282,7 +282,7 @@ d3.csv("instruments-england.csv", function(error, instruments) {
             });
             // Sort instruments (group first, then family, then name)
             // This assumes a family is always part of the same group
-            // (since family specifies color and colors should be next to each other for easthetics)
+            // (since family specifies color and colors should be next to each other for aesthetics)
             instruments.sort(function(a, b) {
                 var result = a.group.localeCompare(b.group);
                 if(result === 0) {
@@ -293,8 +293,6 @@ d3.csv("instruments-england.csv", function(error, instruments) {
                 }
                 return result;
             });
-
-
             return {
                 name : instruments.name,
                 difficulty : +instruments.difficulty,
@@ -302,12 +300,10 @@ d3.csv("instruments-england.csv", function(error, instruments) {
                 group: instruments.group,
                 origin: instruments.origin,
                 distance: instruments.distance
-
-
             };
         }, function(error, rows) {
-            ratData = rows;
-            console.log(ratData);
+            // ratData = rows;
+            // console.log(ratData);
             updateData();
         });
     });
