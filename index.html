@@ -1,52 +1,70 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<style>
-svg {
-	background-color: #525354;
-	max-width: 90vw;		/* 90% of view width */
-	max-height: 90vh;		/* 90% of view height */
-}
-text {
-	font-family: sans-serif;
-	font-size: 12px;
-	fill: #ffffff;
-}
-circle {
-	stroke: none;
-	fill: #606162;
-}
-.instrument path {
-	/*stroke: #525354;*/
-	/*stroke-width: 1;*/
-}
-.group path {
-	stroke: #ffffff;
-	stroke-width: 1;
-	fill: none;
-}
-g.name {
-	transform: rotate(-90deg);	/* Align text with angle 0 */
-}
-.name text {
-	text-anchor: end;		/* Horizontal align */
-	alignment-baseline: middle;	/* Vertical align */
-}
-.group text {
-	text-anchor: start;
-}
-.family1 {
-	fill: #accf5d;
-}
-.family2 {
-	fill: #e17173;
-}
-.family3 {
-	fill: #65c4be;
-}
-.family4 {
-	fill: #f59640;
-}
-</style>
+
+<head>
+
+    <link rel="stylesheet" href="https://use.typekit.net/iyd6ttu.css">
+    <meta charset="utf-8">
+
+    <style>
+        svg {
+            background-color: #525354;
+            max-width: 90vw;		/* 90% of view width */
+            max-height: 90vh;		/* 90% of view height */
+        }
+        text {
+            font-family: "english-grotesque";
+            font-size: 12px;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: .1em;
+            fill: #ffffff;
+        }
+        circle {
+            stroke: none;
+            fill: #606162;
+        }
+        .instrument path {
+            /*stroke: #525354;*/
+            /*stroke-width: 1;*/
+        }
+        .group path {
+            stroke: #ffffff;
+            stroke-width: 1;
+            fill: none;
+        }
+        g.name {
+            transform: rotate(-90deg);	/* Align text with angle 0 */
+        }
+        .name text {
+            text-anchor: start;		/* Horizontal align */
+            alignment-baseline: middle;	/* Vertical align */
+
+        }
+        .group text {
+            text-anchor: middle;
+            font-size: 20px;
+            font-weight: 500;
+        }
+        .family1 {
+            fill: #F16A6B;
+        }
+        .family2 {
+            fill: #F7941D;
+        }
+        .family3 {
+            fill: #AAD04C;
+        }
+        .family4 {
+            fill: #5AC4BE;
+        }
+    </style>
+    <!-- Orange #f59640-->
+    <!--Red #e17173-->
+    <!--Green #accf5d-->
+    <!--Blue #65c4be-->
+</head>
+
+<body>
 <svg viewBox="0 0 500 500">
 
     <!-- Perform all drawing and calculations from center of SVG -->
@@ -89,6 +107,8 @@ g.name {
     </g>
 </svg>
 
+<!-- TODO: Get trigger data swap working -->
+
 <a id="trigger" href="#">Click Me!</a>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -107,11 +127,11 @@ var minLevelRadius = maxRadius * .2;		// At 20% of max radius
 var maxLevelRadius = maxRadius * .75;		// At 75% of max radius
 var groupRadius = maxRadius * .9;		// At 90% of max radius
 var backgroundRadius = maxLevelRadius * 1.05;	// Extend a bit outside level radius
-var textPosition = maxLevelRadius * .8;	// Extend a bit outside level radius
+var textPosition = maxLevelRadius * .35;	// Extend a bit outside level radius
 var groupPaddingAngle = 0.04;
 
 // Read in data and render onto template
-d3.csv("instruments-africa.csv", function(error, instruments) {
+d3.csv("instruments-england.csv", function(error, instruments) {
 
 	// Convert/extract instruments data
 	var familyColorIndex = 1;
@@ -265,6 +285,9 @@ d3.csv("instruments-africa.csv", function(error, instruments) {
 
     // load africa
     d3.select("#trigger").on("click", function() {
+
+        console.log('Im working');
+
         d3.csv("instruments-africa.csv", function(instruments) {
 
             var familyColorIndex = 1;
@@ -301,7 +324,9 @@ d3.csv("instruments-africa.csv", function(error, instruments) {
                 origin: instruments.origin,
                 distance: instruments.distance
             };
-        }, function(error, rows) {
+        },
+
+            function(error, rows) {
             // ratData = rows;
             // console.log(ratData);
             updateData();
@@ -311,3 +336,4 @@ d3.csv("instruments-africa.csv", function(error, instruments) {
 });
 
 </script>
+</body>
