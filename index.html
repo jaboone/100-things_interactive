@@ -13,7 +13,7 @@
         }
         text {
             font-family: "english-grotesque";
-            font-size: 12px;
+            font-size: 10px;
             font-weight: 100;
             text-transform: uppercase;
             letter-spacing: .1em;
@@ -50,7 +50,7 @@
         }
         .group text {
             text-anchor: middle;
-            font-size: 20px;
+            font-size: 15px;
             font-weight: 500;
         }
         .family1 {
@@ -133,6 +133,15 @@
 <ul>
     <li><a class="action select-country" href="#england">England</a></li>
     <li><a class="action select-country" href="#africa">Africa</a></li>
+    <li><a class="action select-country" href="#centralAmerica">Central America</a></li>
+    <li><a class="action select-country" href="#china">China</a></li>
+    <li><a class="action select-country" href="#northAmerica">North America</a></li>
+    <li><a class="action select-country" href="#southAmerica">South America</a></li>
+    <li><a class="action select-country" href="#france">France</a></li>
+
+
+
+
 </ul>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -218,6 +227,9 @@
         // Return class name based on family name
         return "family" + chart.families[d.family];
     });
+
+    //TODO: Fix alphabetical grouping
+
     d3.renderFilter("groups", function(d) {
         // Create an array of groups. Every group consists of an id, the name of the
         // group, the number of instruments within the group and the start (index)
@@ -318,7 +330,7 @@
 
         // Sort instruments (group first, then family, then name)
         // This assumes a family is always part of the same group
-        // (since family specifies color and colors should be next to each other for easthetics)
+        // (since family specifies color and colors should be next to each other for aesthetics)
         instruments.sort(function(a, b) {
             var result = a.group.localeCompare(b.group);
             if(result === 0) {
