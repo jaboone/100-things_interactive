@@ -138,10 +138,6 @@
     <li><a class="action select-country" href="#northAmerica">North America</a></li>
     <li><a class="action select-country" href="#southAmerica">South America</a></li>
     <li><a class="action select-country" href="#france">France</a></li>
-
-
-
-
 </ul>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
@@ -328,13 +324,18 @@
             }
         });
 
-        // Sort instruments (group first, then family, then name)
+        // Sort instruments (1: family, 2: group, 3: name)
         // This assumes a family is always part of the same group
         // (since family specifies color and colors should be next to each other for aesthetics)
         instruments.sort(function(a, b) {
-            var result = a.group.localeCompare(b.group);
+            /* https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/localeCompare */
+
+            var result = a.family.localeCompare(b.family);
+            /*
+            A negative number if the reference string occurs before the compare string; positive if the reference string occurs after the compare string; 0 if they are equivalent.
+            */
             if(result === 0) {
-                result = a.family.localeCompare(b.family);
+                result = a.group.localeCompare(b.group);
                 if(result === 0) {
                     result = a.name.localeCompare(b.name);
                 }
