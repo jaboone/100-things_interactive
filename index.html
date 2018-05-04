@@ -14,7 +14,7 @@
         text {
             font-family: "english-grotesque";
             font-size: 12px;
-            font-weight: 400;
+            font-weight: 100;
             text-transform: uppercase;
             letter-spacing: .1em;
             fill: #ffffff;
@@ -27,6 +27,13 @@
             /*stroke: #525354;*/
             /*stroke-width: 1;*/
         }
+        .hollowRing {
+            fill-rule: evenodd;
+            fill: #606162;
+        }
+        .group {
+            opacity: 0.0;
+        }
         .group path {
             stroke: #ffffff;
             stroke-width: 1;
@@ -34,6 +41,7 @@
         }
         g.name {
             transform: rotate(-90deg);	/* Align text with angle 0 */
+            opacity: 0.0;
         }
         .name text {
             text-anchor: start;		/* Horizontal align */
@@ -57,6 +65,9 @@
         .family4 {
             fill: #5AC4BE;
         }
+        ul {
+            list-style: none;
+        }
     </style>
     <!-- Orange #f59640-->
     <!--Red #e17173-->
@@ -73,7 +84,7 @@
         <!-- Add background circle -->
         <circle data-attr-r="{{.|backgroundRadius}}"></circle>
 
-        <!-- Repeat for every instrument -->
+        <!-- Draw difficulty wedges (repeat for every instrument) -->
         <g data-repeat="{{.}}">
 
             <!-- Rotate instrument into position (all calculations are relative to angle 0 from here on) -->
@@ -85,6 +96,17 @@
                     <!-- Draw single wedge at current difficulty level -->
                     <path data-attr-d="{{.|wedgePath}}"></path>
                 </g>
+            </g>
+        </g>
+
+        <!-- Hollow ring to hide wedges during transitioning -->
+        <path class="hollowRing" d=""></path>
+
+        <!-- Draw instrument name (repeat for every instrument) -->
+        <g data-repeat="{{.}}">
+
+            <!-- Rotate instrument into position (all calculations are relative to angle 0 from here on) -->
+            <g class="instrument" data-attr-transform="{{.|rotateInstrument}}">
 
                 <!-- Draw instrument name -->
                 <g class="name">
@@ -93,7 +115,7 @@
             </g>
         </g>
 
-        <!-- Repeat for every group -->
+        <!-- Draw group name (repeat for every group) -->
         <g data-repeat="{{.|groups}}">
             <g class="group">
                 <path id="{{id}}" data-attr-d="{{.|groupArc}}"></path>
@@ -107,233 +129,296 @@
     </g>
 </svg>
 
-<!-- TODO: Get trigger data swap working -->
-
-<a id="trigger" href="#">Click Me!</a>
+<!-- Menu for the different countries -->
+<ul>
+    <li><a class="action select-country" href="#england">England</a></li>
+    <li><a class="action select-country" href="#africa">Africa</a></li>
+</ul>
 
 <script src="https://d3js.org/d3.v4.min.js"></script>
 <script src="https://unpkg.com/d3-template-plugin/build/d3-template.js"></script>
 <script>
-var width = 500;	// viewbox sets fixed width/height
-var height = 500;
-var margin = {top: 20, right: 20, bottom: 20, left: 20};
+    var width = 500;	// viewbox sets fixed width/height
+    var height = 500;
+    var margin = {top: 20, right: 20, bottom: 20, left: 20};
 
-// Calculate some sizes
-var maxRadius = Math.min(
-	(width - margin.left - margin.right) / 2,
-	(height - margin.top - margin.bottom) / 2
-);
-var minLevelRadius = maxRadius * .2;		// At 20% of max radius
-var maxLevelRadius = maxRadius * .75;		// At 75% of max radius
-var groupRadius = maxRadius * .9;		// At 90% of max radius
-var backgroundRadius = maxLevelRadius * 1.05;	// Extend a bit outside level radius
-var textPosition = maxLevelRadius * .35;	// Extend a bit outside level radius
-var groupPaddingAngle = 0.04;
+    // Calculate some view sizes
+    var maxRadius = Math.min(
+        (width - margin.left - margin.right) / 2,
+        (height - margin.top - margin.bottom) / 2
+    );
+    var minLevelRadius = maxRadius * .2;		// At 20% of max radius
+    var maxLevelRadius = maxRadius * .75;		// At 75% of max radius
+    var groupRadius = maxRadius * .9;		// At 90% of max radius
+    var backgroundRadius = maxLevelRadius * 1.05;	// Extend a bit outside level radius
+    var textPosition = maxLevelRadius * .35;	// Extend a bit outside level radius
 
-// Read in data and render onto template
-d3.csv("instruments-england.csv", function(error, instruments) {
+    // Chart data (used in renderFilters)
+    // The values are partly meaningless defaults which will be replaced
+    // in 'readAndRender()' by effective values based on the instruments
+    // being rendered.
+    var chart = {
 
-	// Convert/extract instruments data
-	var familyColorIndex = 1;
-	var families = {};
-	instruments.forEach(function(instrument) {
+        // Instrument families
+        families: {},
 
-		// Convert string to integer
-		instrument.difficulty = +instrument.difficulty;
+        // Size of wedge in degrees and radians
+        partWidthInDegrees: 0,
+        partWidthInRadians: 0,
 
-		// Give every family unique color index
-		if(!families[instrument.family]) {
-			families[instrument.family] = familyColorIndex;
-			familyColorIndex++;
-		}
-	});
+        // Create arc generator for wedge parts
+        wedgeArcGenerator: d3.arc()
+            .startAngle(0),
 
-	// Sort instruments (group first, then family, then name)
-	// This assumes a family is always part of the same group
-	// (since family specifies color and colors should be next to each other for easthetics)
-	instruments.sort(function(a, b) {
-		var result = a.group.localeCompare(b.group);
-		if(result === 0) {
-			result = a.family.localeCompare(b.family);
-			if(result === 0) {
-				result = a.name.localeCompare(b.name);
-			}
-		}
-		return result;
-	});
+        // Scale band for radius of wedges to show difficulty level
+        // Domain and range will be set in readAndRender()
+        radiusScale: d3.scaleBand().paddingInner(.2),
 
-	// Create scale for radius wedges (donut parts)
-	// See band scales: https://github.com/d3/d3-scale#band-scales
-	var difficultyExtent = d3.extent(instruments, function(instrument) { return instrument.difficulty; });
-	var difficultyRange = d3.range(difficultyExtent[0], difficultyExtent[1] + 1);	// + 1 since 'stop' is not in range
-	var radiusScale = d3.scaleBand()
-	    .domain(difficultyRange)
-	    .range([minLevelRadius, maxLevelRadius])
-	    .paddingInner(.2)
-	;
+        // Create arc generator for group text
+        groupTextArcGenerator: d3.arc()
+            .innerRadius(0)			// This will in fact create pie piece (see "groupArc" filter below for further explanation)
+            .outerRadius(groupRadius)
+            .padAngle(0.04)
+    };
 
-	// Create arc generator for wedges (donut parts)
-	// See arcs: https://github.com/d3/d3-shape#arcs
-	var partWidthInDegress = 360 / instruments.length;
-	var partWidthInRadians = 2 * Math.PI / instruments.length;
-	var wedgeArcGenerator = d3.arc()
-		.startAngle(0)
-		.endAngle(partWidthInRadians)
-	;
+    // Create filters for template
+    d3.renderFilter("backgroundRadius", function() {
+        // Return background radius (will extent a little beyond max radius for the levels)
+        return backgroundRadius;
+    });
+    d3.renderFilter("rotateInstrument", function(d, i) {
+        // Every instrument is rotated into position (from angle 0)
+        // Now the wedges and text can be positioned more easily (all start at angle 0)
+        return "rotate(" + (chart.partWidthInDegrees * i) + ")";
+    });
+    d3.renderFilter("asWedgeArray", function(d) {
+        // Create an array of difficulty levels up to 'actual' difficulty level
+        // Difficulty 3 will result in [1, 2, 3]. For every level a wedge will be created.
+        return d3.range(1, d + 1);
+    });
+    d3.renderFilter("wedgePath", function(d) {
 
-	// Create arc generator for group text
-	var groupTextArcGenerator = d3.arc()
-		.innerRadius(0)			// This will in fact create pie piece (see "groupArc" filter below for further explanation)
-		.outerRadius(groupRadius)
-		.padAngle(groupPaddingAngle)
-	;
-
-	// Create filters for template
-	d3.renderFilter("backgroundRadius", function() {
-		// Return background radius (will extent a little beyond max radius for the levels)
-		return backgroundRadius;
-	});
-	d3.renderFilter("rotateInstrument", function(d, i) {
-		// Every instrument is rotated into position (from angle 0)
-		// Now the wedges and text can be positioned more easily (all start at angle 0)
-		return "rotate(" + (partWidthInDegress * i) + ")";
-	});
-	d3.renderFilter("asWedgeArray", function(d) {
-		// Create an array of difficulty levels up to 'actual' difficulty level
-		// Difficulty 3 will result in [1, 2, 3]. For every level a wedge will be created.
-		return d3.range(1, d + 1);
-	});
-	d3.renderFilter("wedgePath", function(d) {
-		// Create path data for wedge
-		// Based on difficulty level the radius of the wedge is specified
-		return wedgeArcGenerator({
-			innerRadius: radiusScale(d),
-			outerRadius: radiusScale(d) + radiusScale.bandwidth()
-		});
-	});
-	d3.renderFilter("textPosition", function(d) {
-		// Return text position (will extent a little beyond max radius for the levels)
-		return textPosition;
-	});
-	d3.renderFilter("textRotate", function() {
-		// Rotate text so it will be drawn in the middle of the wedge
-		return "rotate(" + (partWidthInDegress / 2) + ")";
-	});
-	d3.renderFilter("familyClass", function(d) {
-		// Return class name based on family name
-		return "family" + families[d.family];
-	});
-	d3.renderFilter("groups", function(d) {
-		// Create an array of groups. Every group consists of an id, the name of the
-		// group, the number of instruments within the group and the start (index)
-		// of the group. The count specifies the size of the arc shown 'above' the group.
-		// The start index specifies where the arc should start.
-		// The id is used to reference the arc (to allow the text to be put onto the arc
-		// of the group).
-		return d.reduce(function(groups, instrument, i) {
-
-			// Check if current instrument has same group as last time
-			if(groups.length > 0 && groups[groups.length - 1].name === instrument.group) {
-
-				// Increase group counter
-				groups[groups.length - 1].count++;
-			} else {
-				// Add new group
-				groups.push({
-					id: 'group' + groups.length,
-					name: instrument.group,
-					count: 1,
-					start: i
-				});
-			}
-
-			return groups;
-		}, []);
-	});
-	d3.renderFilter("groupArc", function(d) {
-		// Create path data for group arc
-		// HACK: Replace everything from first straight line onward. This leaves the
-		// single arc 'curve' as data. This hack assumes some knowledge about the
-		// way the data is generated and might therefore fail if the arc generator
-		// is implemented differently.
-		var arcData = groupTextArcGenerator({
-			startAngle: d.start * partWidthInRadians,
-			endAngle: (d.start + d.count) * partWidthInRadians
-		});
-
-		// Replace all line (and other) commands
-		arcData = arcData
-			.replace(/[Ll][^Aa]*/, "")
-		;
-		return arcData;
-	});
-
-	// Create template and render data onto template
-	d3.select("svg")
-		.template()
-		.render(instruments)
-	;
-
-	// var chart = d3.select("svg") ;
-
-    // d3.select("#trigger").on("click", function() {
-    //     // console.log('got here');
-    //     chart
-    //         .transition() // ALL OF OUR TRANSITIONS WILL GO HERE!
-    //         .attr("x", 250); // Set New Position
-    // });
-
-    // load africa
-    d3.select("#trigger").on("click", function() {
-
-        console.log('Im working');
-
-        d3.csv("instruments-africa.csv", function(instruments) {
-
-            var familyColorIndex = 1;
-            var families = {};
-            instruments.forEach(function(instrument) {
-
-                // Convert string to integer
-                instrument.difficulty = +instrument.difficulty;
-
-                // Give every family unique color index
-                if(!families[instrument.family]) {
-                    families[instrument.family] = familyColorIndex;
-                    familyColorIndex++;
-                }
-            });
-            // Sort instruments (group first, then family, then name)
-            // This assumes a family is always part of the same group
-            // (since family specifies color and colors should be next to each other for aesthetics)
-            instruments.sort(function(a, b) {
-                var result = a.group.localeCompare(b.group);
-                if(result === 0) {
-                    result = a.family.localeCompare(b.family);
-                    if(result === 0) {
-                        result = a.name.localeCompare(b.name);
-                    }
-                }
-                return result;
-            });
-            return {
-                name : instruments.name,
-                difficulty : +instruments.difficulty,
-                family: instruments.family,
-                group: instruments.group,
-                origin: instruments.origin,
-                distance: instruments.distance
-            };
-        },
-
-            function(error, rows) {
-            // ratData = rows;
-            // console.log(ratData);
-            updateData();
+        // Create path data for wedge
+        // Based on difficulty level the radius of the wedge is specified
+        return chart.wedgeArcGenerator({
+            endAngle: chart.partWidthInRadians,
+            innerRadius: chart.radiusScale(d),
+            outerRadius: chart.radiusScale(d) + chart.radiusScale.bandwidth()
         });
     });
+    d3.renderFilter("textPosition", function(d) {
+        // Return text position (will extent a little beyond max radius for the levels)
+        return textPosition;
+    });
+    d3.renderFilter("textRotate", function() {
+        // Rotate text so it will be drawn in the middle of the wedge
+        return "rotate(" + (chart.partWidthInDegrees / 2) + ")";
+    });
+    d3.renderFilter("familyClass", function(d) {
+        // Return class name based on family name
+        return "family" + chart.families[d.family];
+    });
+    d3.renderFilter("groups", function(d) {
+        // Create an array of groups. Every group consists of an id, the name of the
+        // group, the number of instruments within the group and the start (index)
+        // of the group. The count specifies the size of the arc shown 'above' the group.
+        // The start index specifies where the arc should start.
+        // The id is used to reference the arc (to allow the text to be put onto the arc
+        // of the group).
+        return d.reduce(function(groups, instrument, i) {
 
-});
+            // Check if current instrument has same group as last time
+            if(groups.length > 0 && groups[groups.length - 1].name === instrument.group) {
+
+                // Increase group counter
+                groups[groups.length - 1].count++;
+            } else {
+                // Add new group
+                groups.push({
+                    id: 'group' + groups.length,
+                    name: instrument.group,
+                    count: 1,
+                    start: i
+                });
+            }
+
+            return groups;
+        }, []);
+    });
+    d3.renderFilter("groupArc", function(d) {
+        // Create path data for group arc
+        // HACK: Replace everything from first straight line onward. This leaves the
+        // single arc 'curve' as data. This hack assumes some knowledge about the
+        // way the data is generated and might therefore fail if the arc generator
+        // is implemented differently.
+        var arcData = chart.groupTextArcGenerator({
+            startAngle: d.start * chart.partWidthInRadians,
+            endAngle: (d.start + d.count) * chart.partWidthInRadians
+        });
+
+        // Replace all line (and other) commands
+        arcData = arcData
+            .replace(/[Ll][^Aa]*/, "")
+        ;
+        return arcData;
+    });
+
+    // Create template
+    d3.select("svg").template();
+
+    // Keep track of loaded data
+    var instrumentsPerCountry = {};
+
+    // Read in data and render onto template
+    function readAndRender(country) {
+
+        // Decide if data for country is already present (already read)
+        if(!instrumentsPerCountry[country]) {
+
+            // Data has not been read before, read it and render
+            d3.csv("instruments-" + country + ".csv", function(error, instruments) {
+                if(error) {
+                    console.error("Failed to read instrument data for " + country, error);
+                    return;
+                }
+                if(!instruments) {
+                    console.error("No instrument data read for " + country);
+                    return;
+                }
+
+                // Store instruments for later usage
+                instrumentsPerCountry[country] = instruments;
+
+                // Render instruments
+                renderInstruments(instruments);
+            });
+        } else {
+
+            // Data has been read before, render it directly
+            renderInstruments(instrumentsPerCountry[country]);
+        }
+    }
+
+    function renderInstruments(instruments) {
+
+        // Convert/extract instruments data
+        var familyColorIndex = 1;
+        //chart.families = {};
+        instruments.forEach(function(instrument) {
+
+            // Convert string to integer
+            instrument.difficulty = +instrument.difficulty;
+
+            // Give every family unique color index
+            if(!chart.families[instrument.family]) {
+                chart.families[instrument.family] = familyColorIndex;
+                familyColorIndex++;
+            }
+        });
+
+        // Sort instruments (group first, then family, then name)
+        // This assumes a family is always part of the same group
+        // (since family specifies color and colors should be next to each other for easthetics)
+        instruments.sort(function(a, b) {
+            var result = a.group.localeCompare(b.group);
+            if(result === 0) {
+                result = a.family.localeCompare(b.family);
+                if(result === 0) {
+                    result = a.name.localeCompare(b.name);
+                }
+            }
+            return result;
+        });
+
+        // Create scale for radius wedges (donut parts)
+        // See band scales: https://github.com/d3/d3-scale#band-scales
+        var difficultyExtent = d3.extent(instruments, function(instrument) { return instrument.difficulty; });
+        var difficultyRange = d3.range(difficultyExtent[0], difficultyExtent[1] + 1);	// + 1 since 'stop' is not in range
+        chart.radiusScale = d3.scaleBand()
+            .domain(difficultyRange)
+            .range([minLevelRadius, maxLevelRadius])
+            .paddingInner(.2)
+        ;
+
+        // Create arc generator for wedges (donut parts)
+        // See arcs: https://github.com/d3/d3-shape#arcs
+        chart.partWidthInDegrees = 360 / instruments.length;
+        chart.partWidthInRadians = 2 * Math.PI / instruments.length;
+
+        // Render data onto template
+        d3.select("svg").render(instruments);
+
+        // Show chart by transition
+        showChart();
+    }
+
+    // Transition the chart showing/hiding the data
+    function hideChart(callback) {
+        doChart(false, callback);
+    }
+    function showChart(callback) {
+        doChart(true, callback);
+    }
+    function doChart(show, callback) {
+        if(!callback) {
+            callback = function() {};
+        }
+
+        // Create transitions
+        var initialDelay = show ? 400 : 0;
+        var wedgeTransition = d3.transition("wedge")
+            .delay(initialDelay + 40)
+            .duration(1200)
+            .on("end", callback)
+        ;
+        var textTransition = d3.transition("text")
+            .delay(initialDelay + 400)
+            .duration(600)
+            .ease(d3.easeLinear)
+        ;
+
+        // Transition the hollow ring from a thin line on the outside to a thick ring
+        // covering all wedges or vice versa (uncovering the wedges).
+        // Wedges seem to appear/disappear from/into the center this way.
+        var innerRadius = show ? backgroundRadius : minLevelRadius * .9;	// Slightly less then minimum (to prevent odd looking halo)
+        drawHollowRing(innerRadius, wedgeTransition);
+
+        // Show/hide text using opacity/transparency transition.
+        d3.selectAll("g.group").transition(textTransition)
+            .style("opacity", show ? 1 : 0)
+        ;
+        d3.selectAll("g.name").transition(textTransition)
+            .style("opacity", show ? 1 : 0)
+        ;
+    }
+
+    // Draw the hollow ring with the given inner radius (optionally using the transition specified)
+    function drawHollowRing(innerRadius, transition) {
+        var pathData = "M0,-" + backgroundRadius + "A" + backgroundRadius + "," + backgroundRadius + " 0 0,1 0," + backgroundRadius +"A" + backgroundRadius + "," + backgroundRadius + " 0 0,1 0,-" + backgroundRadius + "zM0,-" + innerRadius + "A" + innerRadius + "," + innerRadius + " 0 0,0 0," + innerRadius + "A" + innerRadius + "," + innerRadius + " 0 0,0 0,-" + innerRadius + "z";
+        var hollowRingElement = d3.select(".hollowRing");
+        if(transition) {
+            hollowRingElement = hollowRingElement.transition(transition);
+        }
+        hollowRingElement.attr("d", pathData);
+    }
+
+    // Set event handler
+    d3.selectAll("a.action.select-country").on("click", function() {
+        var actionElement = d3.select(this);
+        var country = actionElement.attr("href").slice(1);	// Remove "#"
+
+        // Hide existing chart data and when done, render (and show) new data
+        hideChart(function() {
+            readAndRender(country);
+        });
+
+        // Prevent the browser from navigating because of link (default browser behaviour)
+        d3.event.preventDefault();
+    });
+
+    // Start with showing England (on empty circle by creating full hollow ring, ie inner radius 0)
+    drawHollowRing(0);
+    readAndRender("england");
 
 </script>
 </body>
