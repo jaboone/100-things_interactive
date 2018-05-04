@@ -53,16 +53,16 @@
             font-size: 15px;
             font-weight: 500;
         }
-        .family1 {
+        .family1 {  /* percussion */
             fill: #F16A6B;
         }
-        .family2 {
+        .family2 { /* string */
             fill: #F7941D;
         }
-        .family3 {
+        .family3 { /* wind */
             fill: #AAD04C;
         }
-        .family4 {
+        .family4 { /* key */
             fill: #5AC4BE;
         }
         ul {
@@ -314,13 +314,41 @@
         //chart.families = {};
         instruments.forEach(function(instrument) {
 
+            var wind = 3 ;
+            var percussion = 1 ;
+            var key = 4 ;
+            var string = 2 ;
+
+            console.log (familyColorIndex, instrument) ;
+
             // Convert string to integer
             instrument.difficulty = +instrument.difficulty;
 
             // Give every family unique color index
             if(!chart.families[instrument.family]) {
-                chart.families[instrument.family] = familyColorIndex;
-                familyColorIndex++;
+
+                switch ( instrument.family ) {
+
+                    case 'wind' :
+                        chart.families[instrument.family] = wind;
+                        break;
+
+                    case 'percussion' :
+                        chart.families[instrument.family] = percussion;
+                        break;
+
+                    case 'key' :
+                        chart.families[instrument.family] = key;
+                        break;
+
+                    case 'string' :
+                        chart.families[instrument.family] = string;
+                        break;
+
+                    default:
+
+                }
+                
             }
         });
 
