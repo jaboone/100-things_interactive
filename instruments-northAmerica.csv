@@ -1,10 +1,10 @@
 name,difficulty,family,group
-Optigan,3,key,Electrophone
-Mellotron,4,key,Electrophone
-Rhodes Piano,3,key,Chordophone
-Keytar,3,key,Chordophone
-Drum Machine,2,key,Electrophone
-Moog Synth,4,key,Electrophone
+Optigan,3,key,Electrophones
+Mellotron,4,key,Electrophones
+Rhodes Piano,3,key,Chordophones
+Keytar,3,key,Chordophones
+Drum Machine,1,key,Electrophones
+Moog Synth,4,key,Electrophones
 Electric Guitar,4,string,Strummed
 Dulcimer,2,string,Plucked
 Double Bass,3,string,Strummed
@@ -12,5 +12,5 @@ Twelve String Guitar,4,string,Strummed
 Banjo,2,string,Strummed
 Ukulele,2,string,Strummed
 Baritone Ukulele,3,string,Strummed
-N.A. Flute,2,wind,flute
+N.A. Flute,2,wind,flutes
 Sousaphone,2,wind,tubas

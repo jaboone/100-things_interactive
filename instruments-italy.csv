@@ -1,0 +1,10 @@
+name,difficulty,family,group
+Monochord,3,key,Chordophones
+Harpsichord,3,key,Chordophones
+Virginal,3,key,Chordophones
+Piano,4,key,Chordophones
+Violetta,3,string,Bowed
+Flamenco Guitar,3,string,Strummed
+Viola,4,string,Bowed
+Cello,4,string,Bowed
+Ocarina,1,wind,flutes

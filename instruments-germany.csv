@@ -1,0 +1,23 @@
+name,difficulty,family,group
+Carillon,3,key,Idiophones
+Tangent Piano,4,key,Chordophones
+Fortepiano,3,key,Chordophones
+Clavichord,3,key,Chordophones
+Clavinet,2,key,Chordophones
+Clavier,2,key,Chordophones
+Electric Piano,3,key,Chordophones
+Pianet,3,key,Chordophones
+Wurlitzer E-Piano,3,key,Chordophones
+Toy Piano,3,key,Idiophones
+Glockenspiel,2,percussion,bells
+Kalimba,2,percussion,Drums
+Tom Tom,2,percussion,Drums
+Violin,4,string,Bowed
+Flugelhorn,3,wind,trumpets
+Piccolo Trumpet,1,wind,trumpets
+Bandoneon,2,wind,Acc
+Concertina,2,wind,Acc
+Euphonium,4,wind,tubas
+Concert Tuba,2,wind,tubas
+Upright Tuba,2,wind,tubas
+bass trumpet,3,wind,trumpets

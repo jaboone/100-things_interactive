@@ -4,10 +4,10 @@ Celesta,2,key,Idiophones
 Glasschord,2,key,Idiophones
 Dulcitone,2,key,Idiophones
 Pedal Harp,1,string,Plucked
-Baritone saxophone,3,wind,saxophones
-tenor saxophone,3,wind,saxophones
-soprano saxophone,3,wind,saxophones
-contrabass saxophone,3,wind,saxophones
+Bar saxophone,3,wind,saxophones
+ten saxophone,3,wind,saxophones
+sop saxophone,4,wind,saxophones
+cb saxophone,4,wind,saxophones
 alto saxophone,3,wind,saxophones
 alto trombone,3,wind,trombones
 Tenor Trombone,3,wind,trombones
